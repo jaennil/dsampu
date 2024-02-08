@@ -13,9 +13,31 @@ const (
 const (
 	find = iota + 1
 	insert
+	delete_
 )
 
+type IArray interface {
+	find(elem int) (int, error)
+	insert(elem, index int) error
+	delete(elem int) error
+}
+
 type sortedArray []int
+
+func newSortedArray(size int) *sortedArray {
+	// cant use array because var array[size]int (size should be known at compile time)
+	// https://stackoverflow.com/questions/8539551/dynamically-initialize-array-size-in-go
+	var array = make(sortedArray, size)
+	for i := range array {
+		if i == 0 {
+			array[0] = randInt(-10*size, 10*size)
+			continue
+		}
+
+		array[i] = randInt(array[i-1], 10*size)
+	}
+	return &array
+}
 
 func (arr *sortedArray) find(elem int) (int, error) {
 	for i, v := range *arr {
@@ -45,7 +67,19 @@ func (arr *sortedArray) insert(elem, index int) error {
 	return nil
 }
 
+func (arr *sortedArray) delete(elem int) error {
+	return nil
+}
+
 type unsortedArray []int
+
+func newUnsortedArray(size int) *unsortedArray {
+	var array = make(unsortedArray, size)
+	for i := range array {
+		array[i] = randInt(-10*size, 10*size)
+	}
+	return &array
+}
 
 func (arr *unsortedArray) find(elem int) (int, error) {
 	for i, v := range *arr {
@@ -75,32 +109,22 @@ func (arr *unsortedArray) insert(elem, index int) error {
 	return nil
 }
 
-type IArray interface {
-	find(elem int) (int, error)
-	insert(elem, index int) error
-}
-
-func newSortedArray(size int) *sortedArray {
-	// cant use array because var array[size]int (size should be known at compile time)
-	// https://stackoverflow.com/questions/8539551/dynamically-initialize-array-size-in-go
-	var array = make(sortedArray, size)
-	for i := range array {
-		if i == 0 {
-			array[0] = randInt(-10*size, 10*size)
+func (arr *unsortedArray) delete(elem int) error {
+	newarray := make([]int, len(*arr)-1)
+	var j int
+	for i := 0; i < len(*arr); i++ {
+		if (*arr)[i] == elem {
 			continue
 		}
-
-		array[i] = randInt(array[i-1], 10*size)
+		newarray[j] = (*arr)[i]
+		j++
 	}
-	return &array
-}
 
-func newUnsortedArray(size int) *unsortedArray {
-	var array = make(unsortedArray, size)
-	for i := range array {
-		array[i] = randInt(-10*size, 10*size)
+	*arr = make([]int, len(newarray))
+	for i, v := range newarray {
+		(*arr)[i] = v
 	}
-	return &array
+	return nil
 }
 
 func randInt(min, max int) int {
@@ -138,6 +162,7 @@ scanOperation:
 	fmt.Println("select operation:")
 	fmt.Println("1. find")
 	fmt.Println("2. insert")
+	fmt.Println("3. delete")
 	fmt.Print(">> ")
 	var operation int
 	fmt.Scanln(&operation)
@@ -165,6 +190,17 @@ scanOperation:
 			break
 		}
 		fmt.Printf("inserted value %v at index %v\n", value, index)
+		fmt.Println("updated array:", array)
+	case delete_:
+		fmt.Print("value to delete: ")
+		var value int
+		fmt.Scanln(&value)
+		err := array.delete(value)
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+		fmt.Printf("deleted value %v\n", value)
 		fmt.Println("updated array:", array)
 	default:
 		fmt.Println("unknown operation try again")
