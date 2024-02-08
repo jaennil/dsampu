@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 )
 
@@ -10,20 +11,20 @@ const (
 	unsorted
 )
 
-type sortedArray []int
+type sortedArray []float64
 
-func (arr sortedArray) find(elem int) int {
+func (arr sortedArray) find(elem float64) float64 {
 	return 0
 }
 
-type unsortedArray []int
+type unsortedArray []float64
 
-func (arr unsortedArray) find(elem int) int {
+func (arr unsortedArray) find(elem float64) float64 {
 	return 0
 }
 
 type IArray interface {
-	find(elem int) int
+	find(elem float64) float64
 }
 
 func newSortedArray(size int) sortedArray {
@@ -31,15 +32,19 @@ func newSortedArray(size int) sortedArray {
 }
 
 func newUnsortedArray(size int) unsortedArray {
-	var array = make([]int, size)
-	for i := range array {
-		array[i] = rand.Intn(100)
+	var array = make([]float64, size)
+	for i := 0; i < size; i++ {
+		array[i] = randFloat64()
 	}
 	return array
 }
 
+func randFloat64() float64 {
+	return rand.Float64() * math.Pow10(308) * (2*rand.Float64() - 1)
+}
+
 func main() {
-	scanArrayType:
+scanArrayType:
 	fmt.Println("1. sorted array")
 	fmt.Println("2. unsorted array")
 
