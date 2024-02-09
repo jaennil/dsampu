@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"reflect"
 )
 
 const (
@@ -22,7 +23,6 @@ type IArray interface {
 	find(elem int) (int, error)
 	insert(elem, index int) error
 	delete(elem int) error
-	binary_search(elem int) (int, error)
 }
 
 type sortedArray []int
@@ -129,22 +129,6 @@ func (arr *unsortedArray) find(elem int) (int, error) {
 	return -1, fmt.Errorf("element %v not found", elem)
 }
 
-func (arr *unsortedArray) binary_search(elem int) (int, error) {
-	var left int = 0
-	var right int = len(*arr) - 1
-	for left <= right {
-		var middle int = int(math.Floor((float64(left) + float64(right)) / 2.0))
-		if (*arr)[middle] < elem {
-			left = middle + 1
-		} else if (*arr)[middle] > elem {
-			right = middle - 1
-		} else {
-			return middle, nil
-		}
-	}
-	return -1, fmt.Errorf("element %v not found")
-}
-
 func (arr *unsortedArray) insert(elem, index int) error {
 	if index < 0 || index > len(*arr) {
 		return fmt.Errorf("index out of bounds")
@@ -224,7 +208,9 @@ scanOperation:
 	fmt.Println("1. find")
 	fmt.Println("2. insert")
 	fmt.Println("3. delete")
-	fmt.Println("4. binary search")
+	if reflect.TypeOf(array).String() == "*main.sortedArray" {
+		fmt.Println("4. binary search")
+	}
 	fmt.Print(">> ")
 	var operation int
 	fmt.Scanln(&operation)
@@ -240,10 +226,14 @@ scanOperation:
 		}
 		fmt.Printf("founded value %v at index %v\n", value, index)
 	case bfind:
+		if reflect.TypeOf(array).String() != "*main.sortedArray" {
+		fmt.Println("unknown operation try again")
+		break
+		}
 		fmt.Print("value to find: ")
 		var value int
 		fmt.Scanln(&value)
-		index, err := array.binary_search(value)
+		index, err := array.(*sortedArray).binary_search(value)
 		if err != nil {
 			fmt.Println(err)
 			break
@@ -276,7 +266,6 @@ scanOperation:
 		fmt.Println("updated array:", array)
 	default:
 		fmt.Println("unknown operation try again")
-		goto scanOperation
 	}
 	goto scanOperation
 }
