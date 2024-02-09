@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 )
 
@@ -14,12 +15,14 @@ const (
 	find = iota + 1
 	insert
 	delete_
+	bfind
 )
 
 type IArray interface {
 	find(elem int) (int, error)
 	insert(elem, index int) error
 	delete(elem int) error
+	binary_search(elem int) (int, error)
 }
 
 type sortedArray []int
@@ -48,6 +51,22 @@ func (arr *sortedArray) find(elem int) (int, error) {
 	return -1, fmt.Errorf("element %v not found", elem)
 }
 
+func (arr *sortedArray) binary_search(elem int) (int, error) {
+	var left int = 0
+	var right int = len(*arr) - 1
+	for left <= right {
+		var middle int = int(math.Floor((float64(left) + float64(right)) / 2.0))
+		if (*arr)[middle] < elem {
+			left = middle + 1
+		} else if (*arr)[middle] > elem {
+			right = middle - 1
+		} else {
+			return middle, nil
+		}
+	}
+	return -1, fmt.Errorf("element %v not found")
+}
+
 func (arr *sortedArray) insert(elem, index int) error {
 	if index < 0 || index > len(*arr) {
 		return fmt.Errorf("index out of bounds")
@@ -68,6 +87,26 @@ func (arr *sortedArray) insert(elem, index int) error {
 }
 
 func (arr *sortedArray) delete(elem int) error {
+	newarray := make([]int, len(*arr)-1)
+	var j int
+	var flag bool
+	for i := 0; i < len(*arr); i++ {
+		if (*arr)[i] == elem && !flag {
+			flag = true
+			continue
+		}
+		newarray[j] = (*arr)[i]
+		j++
+	}
+
+	if !flag {
+		return fmt.Errorf("element not fould %v, elem")
+	}
+
+	*arr = make([]int, len(newarray))
+	for i, v := range newarray {
+		(*arr)[i] = v
+	}
 	return nil
 }
 
@@ -88,6 +127,22 @@ func (arr *unsortedArray) find(elem int) (int, error) {
 		}
 	}
 	return -1, fmt.Errorf("element %v not found", elem)
+}
+
+func (arr *unsortedArray) binary_search(elem int) (int, error) {
+	var left int = 0
+	var right int = len(*arr) - 1
+	for left <= right {
+		var middle int = int(math.Floor((float64(left) + float64(right)) / 2.0))
+		if (*arr)[middle] < elem {
+			left = middle + 1
+		} else if (*arr)[middle] > elem {
+			right = middle - 1
+		} else {
+			return middle, nil
+		}
+	}
+	return -1, fmt.Errorf("element %v not found")
 }
 
 func (arr *unsortedArray) insert(elem, index int) error {
@@ -112,12 +167,18 @@ func (arr *unsortedArray) insert(elem, index int) error {
 func (arr *unsortedArray) delete(elem int) error {
 	newarray := make([]int, len(*arr)-1)
 	var j int
+	var flag bool
 	for i := 0; i < len(*arr); i++ {
-		if (*arr)[i] == elem {
+		if (*arr)[i] == elem && !flag {
+			flag = true
 			continue
 		}
 		newarray[j] = (*arr)[i]
 		j++
+	}
+
+	if !flag {
+		return fmt.Errorf("element not fould %v, elem")
 	}
 
 	*arr = make([]int, len(newarray))
@@ -163,6 +224,7 @@ scanOperation:
 	fmt.Println("1. find")
 	fmt.Println("2. insert")
 	fmt.Println("3. delete")
+	fmt.Println("4. binary search")
 	fmt.Print(">> ")
 	var operation int
 	fmt.Scanln(&operation)
@@ -173,7 +235,17 @@ scanOperation:
 		fmt.Scanln(&value)
 		index, err := array.find(value)
 		if err != nil {
-			fmt.Println("value is not presented in the array")
+			fmt.Println(err)
+			break
+		}
+		fmt.Printf("founded value %v at index %v\n", value, index)
+	case bfind:
+		fmt.Print("value to find: ")
+		var value int
+		fmt.Scanln(&value)
+		index, err := array.binary_search(value)
+		if err != nil {
+			fmt.Println(err)
 			break
 		}
 		fmt.Printf("founded value %v at index %v\n", value, index)
@@ -206,4 +278,5 @@ scanOperation:
 		fmt.Println("unknown operation try again")
 		goto scanOperation
 	}
+	goto scanOperation
 }
