@@ -5,6 +5,8 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"slices"
+	"time"
 )
 
 const (
@@ -32,13 +34,11 @@ func newSortedArray(size int) *sortedArray {
 	// https://stackoverflow.com/questions/8539551/dynamically-initialize-array-size-in-go
 	var array = make(sortedArray, size)
 	for i := range array {
-		if i == 0 {
-			array[0] = randInt(-10*size, 10*size)
-			continue
-		}
-
-		array[i] = randInt(array[i-1], 10*size)
+		array[i] = randInt(math.MinInt32, math.MaxInt32)
 	}
+
+	slices.Sort[[] int](array)
+
 	return &array
 }
 
@@ -214,31 +214,44 @@ scanOperation:
 	fmt.Print(">> ")
 	var operation int
 	fmt.Scanln(&operation)
+
+	var start_time time.Time
+
 	switch operation {
 	case find:
 		fmt.Print("value to find: ")
 		var value int
 		fmt.Scanln(&value)
+
+		start_time = time.Now()
+
 		index, err := array.find(value)
 		if err != nil {
 			fmt.Println(err)
 			break
 		}
 		fmt.Printf("founded value %v at index %v\n", value, index)
+
+		fmt.Println(time.Since(start_time))
 	case bfind:
 		if reflect.TypeOf(array).String() != "*main.sortedArray" {
-		fmt.Println("unknown operation try again")
-		break
+			fmt.Println("unknown operation try again")
+			break
 		}
 		fmt.Print("value to find: ")
 		var value int
 		fmt.Scanln(&value)
+
+		start_time = time.Now()
+
 		index, err := array.(*sortedArray).binary_search(value)
 		if err != nil {
 			fmt.Println(err)
 			break
 		}
 		fmt.Printf("founded value %v at index %v\n", value, index)
+
+		fmt.Println(time.Since(start_time))
 	case insert:
 		fmt.Print("value to insert: ")
 		var value int
@@ -246,6 +259,9 @@ scanOperation:
 		fmt.Print("index: ")
 		var index int
 		fmt.Scanln(&index)
+
+		start_time = time.Now()
+
 		err := array.insert(value, index)
 		if err != nil {
 			fmt.Println(err)
@@ -253,10 +269,16 @@ scanOperation:
 		}
 		fmt.Printf("inserted value %v at index %v\n", value, index)
 		fmt.Println("updated array:", array)
+
+		fmt.Println(time.Since(start_time))
+
 	case delete_:
 		fmt.Print("value to delete: ")
 		var value int
 		fmt.Scanln(&value)
+
+		start_time = time.Now()
+
 		err := array.delete(value)
 		if err != nil {
 			fmt.Println(err)
@@ -264,8 +286,12 @@ scanOperation:
 		}
 		fmt.Printf("deleted value %v\n", value)
 		fmt.Println("updated array:", array)
+
+		fmt.Println(time.Since(start_time))
+
 	default:
 		fmt.Println("unknown operation try again")
 	}
+
 	goto scanOperation
 }
