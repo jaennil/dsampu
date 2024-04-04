@@ -44,6 +44,7 @@ func (ca *customArray) delete(elem int) error {
 				array[k] = array[k+1]
 			}
 			ca.size--
+			ca.value = ca.value[:ca.size]
 			return nil
 		}
 	}
