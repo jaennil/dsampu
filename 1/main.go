@@ -11,8 +11,6 @@ const (
 	custom_sorted_array
 )
 
-const print_array = 4
-
 func main() {
 
 	size := scanSize()
@@ -35,10 +33,10 @@ func createArray(size int) IArray {
 	}
 
 	switch arrayType {
-	case  custom_array:
+	case custom_array:
 		return newCustomArray(size)
 	case custom_sorted_array:
-		return NewCustomSortedArray(size)
+		return newCustomSortedArray(size)
 	default:
 		fmt.Println("wrong array type. try again")
 		return createArray(size)
@@ -51,6 +49,10 @@ func mainloop(array IArray) {
 		fmt.Println("2. insert")
 		fmt.Println("3. delete")
 		fmt.Println("4. print array")
+
+		if _, ok := array.(*customSortedArray); ok {
+			fmt.Println("5. binary search")
+		}
 
 		operation, err := scanInt()
 		if err != nil {
@@ -126,8 +128,37 @@ func mainloop(array IArray) {
 
 			fmt.Printf("element %v deleted successfully\n", value)
 
-		case print_array:
+		case print:
 			fmt.Println(array)
+		case bfind:
+			switch castedArray := array.(type) {
+			case *customArray:
+				fmt.Println("binary search is not supported for unsorted array")
+				continue
+			case *customSortedArray:
+				fmt.Print("enter value to find: ")
+
+				value, err := scanInt()
+				if err != nil {
+					fmt.Println("you should enter integer")
+					continue
+				}
+
+				start := time.Now()
+
+				index, err := castedArray.bfind(value)
+
+				took_time := time.Since(start)
+
+				fmt.Printf("operation took %v\n", took_time)
+
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+
+				fmt.Printf("using binary search found value %v at index: %v\n", value, index)
+			}
 		default:
 			fmt.Println("wrong operation. try again")
 			continue

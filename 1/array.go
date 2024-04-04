@@ -6,6 +6,8 @@ const (
 	find = iota + 1
 	insert
 	delete
+	print
+	bfind
 )
 
 type IArray interface {
