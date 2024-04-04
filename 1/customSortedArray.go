@@ -27,8 +27,6 @@ func (csa *customSortedArray) insert(elem int) {
 		}
 	}
 
-	fmt.Println(i)
-
 	csa.value = append(csa.value, csa.value[len(csa.value)-1])
 
 	for k := csa.size - 1; k > i; k-- {
