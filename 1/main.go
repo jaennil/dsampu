@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -38,7 +39,14 @@ func mainloop(customArray customArray) {
 				continue
 			}
 
+			start := time.Now()
+
 			index, err := customArray.find(value)
+
+			took_time := time.Since(start)
+
+			fmt.Printf("operation took %v\n", took_time)
+
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -55,7 +63,13 @@ func mainloop(customArray customArray) {
 				continue
 			}
 
+			start := time.Now()
+
 			customArray.insert(value)
+
+			took_time := time.Since(start)
+
+			fmt.Printf("operation took %v\n", took_time)
 
 			fmt.Println(customArray)
 		case delete:
@@ -67,7 +81,14 @@ func mainloop(customArray customArray) {
 				continue
 			}
 
+			start := time.Now()
+
 			err = customArray.delete(value)
+
+			took_time := time.Since(start)
+
+			fmt.Printf("operation took %v\n", took_time)
+
 			if err != nil {
 				fmt.Println(err)
 			}
