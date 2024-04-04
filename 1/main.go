@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const print_array = 4
+
 func main() {
 
 	size := scanSize()
@@ -17,11 +19,10 @@ func main() {
 
 func mainloop(customArray customArray) {
 	for {
-		fmt.Println(customArray)
-
 		fmt.Println("1. find")
 		fmt.Println("2. insert")
 		fmt.Println("3. delete")
+		fmt.Println("4. print array")
 
 		operation, err := scanInt()
 		if err != nil {
@@ -69,11 +70,12 @@ func mainloop(customArray customArray) {
 
 			took_time := time.Since(start)
 
+			fmt.Printf("element %v inserted successfully\n", value)
+
 			fmt.Printf("operation took %v\n", took_time)
 
-			fmt.Println(customArray)
 		case delete:
-			fmt.Print("entere value to delete: ")
+			fmt.Print("enter value to delete: ")
 
 			value, err := scanInt()
 			if err != nil {
@@ -91,7 +93,16 @@ func mainloop(customArray customArray) {
 
 			if err != nil {
 				fmt.Println(err)
+				continue
 			}
+
+			fmt.Printf("element %v deleted successfully\n", value)
+
+		case print_array:
+			fmt.Println(customArray)
+		default:
+			fmt.Println("wrong operation. try again")
+			continue
 		}
 	}
 }
