@@ -31,12 +31,26 @@ func (csa *customSortedArray) insert(elem int) {
 
 	csa.value = append(csa.value, csa.value[len(csa.value)-1])
 
-	for k := csa.size-1; k > i; k-- {
+	for k := csa.size - 1; k > i; k-- {
 		csa.value[k] = csa.value[k-1]
 	}
 
 	csa.value[i] = elem
 	csa.size++
+}
+
+func (csa *customSortedArray) delete(elem int) error {
+	index, err := csa.bfind(elem)
+	if err != nil {
+		return err
+	}
+
+	for k := index; k < csa.size - 1; k++ {
+		csa.value[k] = csa.value[k+1]
+	}
+
+	csa.size--
+	return nil
 }
 
 func (csa customSortedArray) bfind(elem int) (int, error) {
