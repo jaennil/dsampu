@@ -11,17 +11,17 @@ type customArray struct {
 	size  int
 }
 
-func newCustomArray(size int) customArray {
+func newCustomArray(size int) *customArray {
 	array := customArray{make([]int, size), size}
 
 	for i := range size {
 		array.value[i] = randInt(math.MinInt32, math.MaxInt32)
 	}
 
-	return array
+	return &array
 }
 
-func (ca customArray) find(elem int) (int, error) {
+func (ca *customArray) find(elem int) (int, error) {
 	for i := range ca.size {
 		if ca.value[i] == elem {
 			return i, nil

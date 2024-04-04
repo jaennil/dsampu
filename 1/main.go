@@ -6,18 +6,46 @@ import (
 	"time"
 )
 
+const (
+	custom_array = iota + 1
+	custom_sorted_array
+)
+
 const print_array = 4
 
 func main() {
 
 	size := scanSize()
 
-	customArray := newCustomArray(size)
+	array := createArray(size)
 
-	mainloop(customArray)
+	mainloop(array)
 }
 
-func mainloop(customArray customArray) {
+func createArray(size int) IArray {
+	fmt.Println("1. unsorted array")
+	fmt.Println("2. sorted array")
+
+	fmt.Print("enter array type: ")
+
+	arrayType, err := scanInt()
+	if err != nil {
+		fmt.Println("you should enter integer")
+		return createArray(size)
+	}
+
+	switch arrayType {
+	case  custom_array:
+		return newCustomArray(size)
+	case custom_sorted_array:
+		return NewCustomSortedArray(size)
+	default:
+		fmt.Println("wrong array type. try again")
+		return createArray(size)
+	}
+}
+
+func mainloop(array IArray) {
 	for {
 		fmt.Println("1. find")
 		fmt.Println("2. insert")
@@ -42,7 +70,7 @@ func mainloop(customArray customArray) {
 
 			start := time.Now()
 
-			index, err := customArray.find(value)
+			index, err := array.find(value)
 
 			took_time := time.Since(start)
 
@@ -66,7 +94,7 @@ func mainloop(customArray customArray) {
 
 			start := time.Now()
 
-			customArray.insert(value)
+			array.insert(value)
 
 			took_time := time.Since(start)
 
@@ -85,7 +113,7 @@ func mainloop(customArray customArray) {
 
 			start := time.Now()
 
-			err = customArray.delete(value)
+			err = array.delete(value)
 
 			took_time := time.Since(start)
 
@@ -99,7 +127,7 @@ func mainloop(customArray customArray) {
 			fmt.Printf("element %v deleted successfully\n", value)
 
 		case print_array:
-			fmt.Println(customArray)
+			fmt.Println(array)
 		default:
 			fmt.Println("wrong operation. try again")
 			continue
