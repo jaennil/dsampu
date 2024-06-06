@@ -74,11 +74,11 @@ func (tree tree) String() string {
 		if current.hasLeft() || current.hasRight() {
 			result += strings.Repeat(" ", center-digitLength(current.value)/2)
 			if current.hasLeft() {
-				result += "/ "
+				result += "/"
 			}
 
 			if current.hasRight() {
-				result += "\\ "
+				result += "\\"
 			}
 
 			result += "\n"
